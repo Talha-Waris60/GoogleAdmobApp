@@ -13,7 +13,7 @@ import com.google.android.gms.ads.MobileAds
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        const val APP_TAG = "Admob"
+        const val APP_TAG = "Admob_App"
     }
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onAdFailedToLoad(adError : LoadAdError) {
-                Log.d(APP_TAG, "onAdFailedToLoad")
+                Log.d(APP_TAG, "Message -> $adError")
                 // Code to be executed when an ad request fails.
             }
 
