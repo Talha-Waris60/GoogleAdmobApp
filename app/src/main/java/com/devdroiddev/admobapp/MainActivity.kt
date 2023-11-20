@@ -2,13 +2,18 @@ package com.devdroiddev.admobapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.databinding.BindingAdapter
 import com.devdroiddev.admobapp.databinding.ActivityMainBinding
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +21,9 @@ class MainActivity : AppCompatActivity() {
         const val APP_TAG = "Admob_App"
     }
     private lateinit var binding : ActivityMainBinding
+    private lateinit var adRequest : AdRequest
+    private var _interstitialAd: InterstitialAd? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -23,54 +31,70 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Initialize Ads
-        MobileAds.initialize(this)
-        loadAdsRequest()
+        init()
         initListener()
+    }
+
+    private fun init() {
+       MobileAds.initialize(this)
+        adRequest  = AdRequest.Builder().build()
     }
 
     private fun initListener() {
 
-        binding.bannerAdView.adListener = object: AdListener() {
-            override fun onAdClicked() {
-                Log.d(APP_TAG, "onAdClicked")
-                // Code to be executed when the user clicks on an ad.
-            }
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-3940256099942544/1033173712",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    super.onAdLoaded(interstitialAd)
+                    _interstitialAd = interstitialAd
 
-            override fun onAdClosed() {
-                Log.d(APP_TAG, "onAdClosed")
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
+                    // CallBacks
+                    _interstitialAd?.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdClicked() {
+                                // Called when a click is recorded for an ad.
+                                Log.d(APP_TAG, "Ad was clicked.")
+                            }
 
-            override fun onAdFailedToLoad(adError : LoadAdError) {
-                Log.d(APP_TAG, "Message -> $adError")
-                // Code to be executed when an ad request fails.
-            }
+                            override fun onAdDismissedFullScreenContent() {
+                                // Called when ad is dismissed.
+                                Log.d(APP_TAG, "Ad dismissed fullscreen content.")
+                            }
 
-            override fun onAdImpression() {
-                Log.d(APP_TAG, "onAdImpression")
-                // Code to be executed when an impression is recorded
-                // for an ad.
-            }
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                // Called when ad fails to show.
+                                Log.e(APP_TAG, "Ad failed to show fullscreen content.")
+                            }
 
-            override fun onAdLoaded() {
-                Log.d(APP_TAG, "onAdLoaded")
+                            override fun onAdImpression() {
+                                // Called when an impression is recorded for an ad.
+                                Log.d(APP_TAG, "Ad recorded an impression.")
+                            }
 
-                // Code to be executed when an ad finishes loading.
-            }
+                            override fun onAdShowedFullScreenContent() {
+                                // Called when ad is shown.
+                                Log.d(APP_TAG, "Ad showed fullscreen content.")
+                                _interstitialAd = null
+                            }
+                        }
+                }
 
-            override fun onAdOpened() {
-                Log.d(APP_TAG, "onAdOpened")
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    super.onAdFailedToLoad(loadAdError)
+                    Log.d(APP_TAG, "Load Error -> $loadAdError")
+                }
+            })
+
+        Handler().postDelayed({
+            if (_interstitialAd != null) {
+                _interstitialAd?.show(this@MainActivity)
+            } else {
+                Log.d("TAG", "The interstitial ad wasn't ready yet.")
             }
-        }
+        }, 10000)
     }
 
-    private fun loadAdsRequest() {
-
-        val adRequest = AdRequest.Builder().build()
-        binding.bannerAdView.loadAd(adRequest)
-
-    }
 }
