@@ -33,7 +33,9 @@ class MainActivity : AppCompatActivity() {
         // Initialize Ads
         init()
         initListener()
+        showBannerAd()
     }
+
 
     private fun init() {
        MobileAds.initialize(this)
@@ -88,13 +90,60 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-        Handler().postDelayed({
-            if (_interstitialAd != null) {
-                _interstitialAd?.show(this@MainActivity)
-            } else {
-                Log.d("TAG", "The interstitial ad wasn't ready yet.")
+        binding.interstitialAd.setOnClickListener {
+            Handler().postDelayed({
+                if (_interstitialAd != null) {
+                    Log.d(APP_TAG, "Not Null")
+                    _interstitialAd?.show(this@MainActivity)
+                } else {
+                    Log.d("TAG", "The interstitial ad wasn't ready yet.")
+                }
+            }, 10000)
+        }
+
+    }
+
+    private fun showBannerAd() {
+
+        binding.bannerAdView.loadAd(adRequest)
+
+        binding.bannerAdView.adListener = object: AdListener() {
+            override fun onAdClicked() {
+                Log.d(APP_TAG, "onAdClicked")
+                // Code to be executed when the user clicks on an ad.
             }
-        }, 10000)
+
+            override fun onAdClosed() {
+                Log.d(APP_TAG, "onAdClosed")
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+
+            override fun onAdFailedToLoad(adError : LoadAdError) {
+                Log.d(APP_TAG, "onAdFailedToLoad")
+                // Code to be executed when an ad request fails.
+            }
+
+            override fun onAdImpression() {
+                Log.d(APP_TAG, "onAdImpression")
+                // Code to be executed when an impression is recorded
+                // for an ad.
+            }
+
+            override fun onAdLoaded() {
+                Log.d(APP_TAG, "onAdLoaded")
+
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdOpened() {
+                Log.d(APP_TAG, "onAdOpened")
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+        }
+
     }
 
 }

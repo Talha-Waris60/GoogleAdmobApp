@@ -7,23 +7,31 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/interstitial_ad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Interstitial Ads"/>
+        android:text="Interstitial Ad"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="40dp"/>
 
     <Button
+        android:id="@+id/rewarded_ad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rewarded Ads"/>
+        android:text="Rewarded Ad"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="40dp"
+        />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/bannerAdView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        adSize="INTERSTITIAL"
-        adUnitId="ca-app-pub-3940256099942544/6300978111"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
 
 </RelativeLayout>
